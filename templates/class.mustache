@@ -11,12 +11,6 @@ type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
 {{/definitions}}
 
 type Logger = { log: (line: string) => any };
-
-/**
- * {{&description}}
- * @class {{&className}}
- * @param {(string)} [domainOrOptions] - The project domain.
- */
 export default class {{&className}} {
 
     private domain: string = "{{&domain}}";
