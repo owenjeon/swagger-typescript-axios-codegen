@@ -22,6 +22,7 @@ export default class {{&className}} {
     private static instance: {{&className}};
     private domain: string = config.NewApiUrl;
     private errorHandlers: CallbackHandler[] = [];
+    private headers: any = {};
 
     constructor(domain?: string, private logger?: Logger) {
         if(domain) {
@@ -31,6 +32,10 @@ export default class {{&className}} {
 
     getDomain() {
         return this.domain;
+    }
+    
+    public SetHeader(name: string, value: string) {
+        this.headers[name] = value;
     }
 
     addErrorHandler(handler: CallbackHandler) {
@@ -42,10 +47,13 @@ export default class {{&className}} {
           this.logger.log(`Call ${method} ${url}`);
         }
 
+        // merge class headers with request headers
+        const mergedHeaders = { ...this.headers, ...headers };
+        
         let req = (request as SuperAgentStatic)(method, url).query(queryParameters);
 
-        Object.keys(headers).forEach(key => {
-            req.set(key, headers[key]);
+        Object.keys(mergedHeaders).forEach(key => {
+            req.set(key, mergedHeaders[key]);
         });
 
         if(body) {
