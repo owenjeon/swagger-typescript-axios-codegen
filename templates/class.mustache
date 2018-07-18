@@ -4,7 +4,6 @@
 
 import * as request from "superagent";
 import {SuperAgentStatic} from "superagent";
-import config from "../../../src/config";
 
 type CallbackHandler = (err: any, res?: request.Response) => void;
 {{#definitions}}
@@ -20,7 +19,7 @@ export default class {{&className}} {
         return this.instance;
     }
     private static instance: {{&className}};
-    private domain: string = config.NewApiUrl;
+    private domain: string = "{{&domain}}";
     private errorHandlers: CallbackHandler[] = [];
     private headers: any = {};
 
