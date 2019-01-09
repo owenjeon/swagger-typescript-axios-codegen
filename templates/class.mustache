@@ -16,7 +16,7 @@ export type ConfigureRequestHandler = (agent: SuperAgentRequest) => SuperAgentRe
 export type CallbackHandler = (err: any, res?: request.Response) => void;
 
 {{#definitions}}
-export interface I{{&name}}  {{#tsType}}{{> type}}{{/tsType}};
+export type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
 {{/definitions}}
 
 export type Logger = { log: (line: string) => any };
