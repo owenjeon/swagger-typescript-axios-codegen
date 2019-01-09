@@ -1,11 +1,82 @@
+{{&methodName}}URL(parameters: {
+{{#parameters}}{{^isSingleton}}'{{&camelCaseName}}'{{&cardinality}}: {{> type}},
+{{/isSingleton}}{{/parameters}}
+} & CommonRequestOptions): string {
+    let queryParameters: any = {};
+    const domain = parameters.$domain ? parameters.$domain : this.domain;
+    let path = '{{&path}}';
+    if (parameters.$path) {
+        path = (typeof(parameters.$path) === 'function') ? parameters.$path(path) : parameters.$path;
+    } 
+
+    {{#parameters}}
+        {{#isQueryParameter}}
+            {{#isSingleton}}
+                queryParameters['{{&name}}'] = '{{&singleton}}';
+            {{/isSingleton}}
+            {{^isSingleton}}
+                {{#isPatternType}}
+                    Object.keys(parameters).forEach(function(parameterName) {
+                    if(new RegExp('{{&pattern}}').test(parameterName)){
+                    queryParameters[parameterName] = parameters[parameterName];
+                    }
+                    });
+                {{/isPatternType}}
+                {{^isPatternType}}
+                    if(parameters['{{&camelCaseName}}'] !== undefined){
+                    queryParameters['{{&name}}'] = parameters['{{&camelCaseName}}'];
+                    }
+                {{/isPatternType}}
+            {{/isSingleton}}
+        {{/isQueryParameter}}
+
+        {{#isPathParameter}}
+            path = path.replace('{{=<% %>=}}{<%&name%>}<%={{ }}=%>', `${parameters['{{&camelCaseName}}']}`);
+        {{/isPathParameter}}
+    {{/parameters}}
+    
+    if (parameters.$queryParameters !== undefined && parameters.$queryParameters !== null) {
+        queryParameters = {
+            ...queryParameters,
+            ...parameters.$queryParameters
+        }
+    }
+
+    {{^isBodyParameter}}
+        {{#isPOST}}
+    queryParameters = {};
+        {{/isPOST}}
+    {{/isBodyParameter}}
+
+
+    let keys = Object.keys(queryParameters);
+    return domain + path + (keys.length > 0 ? '?' + (keys.map(key => key + '=' + encodeURIComponent(queryParameters[key])).join('&')): '');
+}
+
+/**
+* {{&summary}}
+* @method
+{{#externalDocs}}
+* @see {@link {{&url}}|{{#description}}{{&description}}{{/description}}{{^description}}External docs{{/description}}}
+{{/externalDocs}}
+* @name {{&className}}#{{&methodName}}
+{{#parameters}}
+    {{^isSingleton}} * @param {{=<% %>=}}{<%&type%>}<%={{ }}=%> {{&camelCaseName}} - {{&description}}{{/isSingleton}}
+{{/parameters}}
+*/
 {{&methodName}}(parameters: {
 {{#parameters}}{{^isSingleton}}'{{&camelCaseName}}'{{&cardinality}}: {{> type}},
 {{/isSingleton}}{{/parameters}}
     $queryParameters?: any,
-    $domain?: string
-}): Promise<request.Response> {
+    $domain?: string,
+    $path?: string | ((path: string) => string)
+}): Promise<ResponseWithBody<{{&successfulResponseType}}>> {
     const domain = parameters.$domain ? parameters.$domain : this.domain;
     let path = '{{&path}}';
+    if (parameters.$path) {
+        path = (typeof(parameters.$path) === 'function') ? parameters.$path(path) : parameters.$path;
+    } 
+
     let body: any;
     let queryParameters: any = {};
     let headers: any = {};
