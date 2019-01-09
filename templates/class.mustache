@@ -54,10 +54,6 @@ export class {{&className}} {
     getDomain() {
         return this.domain;
     }
-    
-    public SetHeader(name: string, value: string) {
-        this.headers[name] = value;
-    }
 
     addErrorHandler(handler: CallbackHandler) {
         this.errorHandlers.push(handler);
