@@ -2,10 +2,10 @@
 /// <reference path="{{&.}}" />
 {{/imports}}
 
-import request, { SuperAgentStatic, SuperAgentRequest, Response } from "superagent";
+import request, { SuperAgentStatic, SuperAgentRequest, Response, } from "superagent";
 
-export type RequestHeaders = {
-    [header: string]: string;
+export interface RequestHeaders  {
+    header: string[];
 }
 export type RequestHeadersHandler = (headers: RequestHeaders) => RequestHeaders;
 
@@ -16,8 +16,7 @@ export type ConfigureRequestHandler = (agent: SuperAgentRequest) => SuperAgentRe
 export type CallbackHandler = (err: any, res?: request.Response) => void;
 
 {{#definitions}}
-export type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
-
+export interface I{{&name}}  {{#tsType}}{{> type}}{{/tsType}};
 {{/definitions}}
 
 export type Logger = { log: (line: string) => any };
