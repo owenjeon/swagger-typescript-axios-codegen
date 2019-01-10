@@ -4,7 +4,8 @@ var CodeGen = require('../lib/codegen').CodeGen;
 
 var file = "./axiosTest/invoice.json"
 
-var swagger = JSON.parse(fs.readFileSync(file, 'UTF-8'));
+var swagger = JSON.parse(fs.readFileSync(file, 'UTF-8').replace(/«/g,"").replace(/»/g,"").replace(/string,Link/g,"StringLink"));
+
 var tsSourceCode = CodeGen.getCustomCode({
     moduleName: 'Test',
     className: 'Test',
