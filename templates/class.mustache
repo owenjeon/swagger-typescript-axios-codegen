@@ -2,35 +2,17 @@
 /// <reference path="{{&.}}" />
 {{/imports}}
 
-import request, { SuperAgentStatic, SuperAgentRequest, Response } from "superagent";
+import axios from "axios";
+import { AxiosInstance, AxiosPromise } from "axios";
 
-export type RequestHeaders = {
-    [header: string]: string;
+export interface RequestHeaders  {
+    header: string[];
 }
-export type RequestHeadersHandler = (headers: RequestHeaders) => RequestHeaders;
-
-export type ConfigureAgentHandler = (agent: SuperAgentStatic) => SuperAgentStatic;
-
-export type ConfigureRequestHandler = (agent: SuperAgentRequest) => SuperAgentRequest;
-
-export type CallbackHandler = (err: any, res?: request.Response) => void;
 
 {{#definitions}}
-export type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
-
+export type {{&name}} = {{#tsType}}{{> type}};{{/tsType}};
 {{/definitions}}
 
-export type Logger = { log: (line: string) => any };
-
-export interface ResponseWithBody<T> extends Response {
-    body: T;
-}
-
-export interface CommonRequestOptions {
-  $queryParameters?: {[param: string]: any};
-  $domain?: string;
-  $path?: string | ((path: string) => string);
-}
 
 /**
  * {{&description}}
@@ -39,83 +21,52 @@ export interface CommonRequestOptions {
  */
 export class {{&className}} {
 
-    private domain: string = "{{&domain}}";
-    private errorHandlers: CallbackHandler[] = [];
-    private requestHeadersHandler?: RequestHeadersHandler;
-    private configureAgentHandler?: ConfigureAgentHandler;
-    private configureRequestHandler?: ConfigureRequestHandler;
-
-    constructor(domain?: string, private logger?: Logger) {
-        if(domain) {
-            this.domain = domain;
+    public static getInstance() {
+        if (!this.instance) {
+            this.instance = new {{&className}}();
         }
+        return this.instance;
+    }
+    private baseURL: string = "{{&domain}}";
+    private static instance: {{&className}};
+    private AuthToken: string | null;
+    private axios: AxiosInstance;
+    private headers: { Authorization?: string };
+
+    private constructor() {
+        // empty;
+        this.CreateAxiosInstance();
     }
 
-    getDomain() {
-        return this.domain;
-    }
-
-    addErrorHandler(handler: CallbackHandler) {
-        this.errorHandlers.push(handler);
-    }
-
-    setRequestHeadersHandler(handler: RequestHeadersHandler) {
-        this.requestHeadersHandler = handler;
-    }
-
-    setConfigureAgentHandler(handler: ConfigureAgentHandler) {
-        this.configureAgentHandler = handler;
-    }
-
-    setConfigureRequestHandler(handler: ConfigureRequestHandler) {
-        this.configureRequestHandler = handler;
-    }
-
-    private request(method: string, url: string, body: any, headers: RequestHeaders, queryParameters: any, form: any, reject: CallbackHandler, resolve: CallbackHandler) {
-        if(this.logger) {
-          this.logger.log(`Call ${method} ${url}`);
-        }
-
-        const agent = this.configureAgentHandler
-            ? this.configureAgentHandler(request)
-            : request;
-
-        let req = agent(method, url);
-        if (this.configureRequestHandler) {
-            req = this.configureRequestHandler(req);
-        }
-     
-        req = req.query(queryParameters);
-
-        if(body) {
-            req.send(body);
-        
-            if(typeof(body) === 'object' && !(body.constructor.name === 'Buffer')) {
-                headers['Content-Type'] = 'application/json';
-            }
-        }
-
-        if(Object.keys(form).length > 0) {
-            req.type('form');
-            req.send(form);
-        }
-
-        if (this.requestHeadersHandler) {
-            headers = this.requestHeadersHandler({...headers});
-        }
-
-        Object.keys(headers).forEach(key => {
-            req.set(key, headers[key]);
+    public CreateAxiosInstance() {
+        this.axios = axios.create({
+            baseURL: this.baseURL,
+            timeout: 100000,
+            headers: this.getHeaders(),
         });
+    }
 
-        req.end((error, response) => {
-            if(error || !response.ok) {
-                reject(error);
-                this.errorHandlers.forEach(handler => handler(error));
-            } else {
-                resolve(response);
-            }
-        });
+    public setBaseURL(url: string) {
+        this.baseURL = url;
+        this.CreateAxiosInstance();
+    }
+
+    public setAuthToken(token: string) {
+        this.AuthToken = token;
+        this.CreateAxiosInstance();
+    }
+
+    public destroy() {
+        this.AuthToken = null;
+    }
+
+    public getHeaders(): any {
+        this.headers = {};
+        this.headers["Accept-Language"] = "fa_IR";
+        if (this.AuthToken) {
+            this.headers.Authorization = "Bearer " + this.AuthToken;
+        }
+        return this.headers;
     }
 
 {{#methods}}
