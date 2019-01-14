@@ -1,42 +1,30 @@
-    {{#isPOST}}
-    public {{&methodName}}(
-    {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
-    {{/isSingleton}}{{/parameters}}
-    ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.post ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
-        {{/isSingleton}}{{/parameters}});
-    }
-    {{/isPOST}}
-    
-    {{#isGET}}
-    public {{&methodName}}(
-        params : {
-            {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},{{/isSingleton}}{{/parameters}}
-        }
-    ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.get ("{{&path}}", {params});
-    }
-    {{/isGET}}
+public {{&methodName}}(  params :
+{
+{{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
+{{/isSingleton}}{{/parameters}}  
+}  
+): AxiosPromise<{{&successfulResponseType}}> {
+    let body = null;
+    let path = "{{&path}}";
+    const query:{} = {};
+    {{#parameters}}        
+        {{#isBodyParameter}}
+                body = params['{{&camelCaseName}}'];
+        {{/isBodyParameter}}
+        {{#isPathParameter}}
+            path = path.replace('{{=<% %>=}}{<%&name%>}<%={{ }}=%>', `${params['{{&camelCaseName}}']}`);
+            delete params['{{&camelCaseName}}'];
+        {{/isPathParameter}}            
+        {{#isQueryParameter}}
+            query[`{{&camelCaseName}}`] = params['{{&camelCaseName}}']
+        {{/isQueryParameter}}      
+    {{/parameters}}
+    return this.axios({
+      method:'{{method}}',
+      url:path,
+      params : query,
+      data: (body)?body:params,
+    } );
 
-    
-    {{#isPUT}}
-    public {{&methodName}}(
-    {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
-    {{/isSingleton}}{{/parameters}}
-    ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.put ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
-        {{/isSingleton}}{{/parameters}});
-    }
-    {{/isPUT}}
-
-
-    {{#isPATCH}}
-    public {{&methodName}}(
-    {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
-    {{/isSingleton}}{{/parameters}}
-    ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.patch ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
-        {{/isSingleton}}{{/parameters}});
-    }
-    {{/isPATCH}}
+}
 

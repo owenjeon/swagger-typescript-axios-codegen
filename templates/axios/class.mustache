@@ -10,7 +10,7 @@ export interface RequestHeaders  {
 }
 
 {{#definitions}}
-export type {{&name}} = {{#tsType}}{{> type}}{{/tsType}};
+export type {{&name}} = {{#tsType}}{{> type}};{{/tsType}};
 {{/definitions}}
 
 
@@ -69,22 +69,6 @@ export class {{&className}} {
         return this.headers;
     }
 
-    // Api Calls TODO : they will be generated from swagger
-    public GetCountries() {
-        return this.axios.get("/country");
-    }
-
-    public postKYC(data: InvRequest): AxiosPromise<InvoiceResponse> {
-        return this.axios.post<Merchant>("https://api.becopay.com/invoice", data);
-    }
-
-    public getAllKYC() {
-        return this.axios.get("/kyc");
-    }
-
-    public changeKycStatus(uid, status) {
-        return this.axios.put("/kyc/" + uid + "/" + status);
-    }
 //-----------------------------------------------------
 {{#methods}}
     {{> method}}
