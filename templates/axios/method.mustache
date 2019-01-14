@@ -3,18 +3,18 @@
     {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
     {{/isSingleton}}{{/parameters}}
     ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.post ("https://api.becopay.com/invoice", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
+        return this.axios.post ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
         {{/isSingleton}}{{/parameters}});
     }
     {{/isPOST}}
     
     {{#isGET}}
     public {{&methodName}}(
-    {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
-    {{/isSingleton}}{{/parameters}}
+        params : {
+            {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},{{/isSingleton}}{{/parameters}}
+        }
     ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.get ("https://api.becopay.com/invoice", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
-        {{/isSingleton}}{{/parameters}});
+        return this.axios.get ("{{&path}}", {params});
     }
     {{/isGET}}
 
@@ -24,7 +24,7 @@
     {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
     {{/isSingleton}}{{/parameters}}
     ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.put ("https://api.becopay.com/invoice", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
+        return this.axios.put ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
         {{/isSingleton}}{{/parameters}});
     }
     {{/isPUT}}
@@ -35,7 +35,7 @@
     {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}: {{> type}},
     {{/isSingleton}}{{/parameters}}
     ): AxiosPromise<{{&successfulResponseType}}> {
-        return this.axios.patch ("https://api.becopay.com/invoice", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
+        return this.axios.patch ("{{&path}}", {{#parameters}}{{^isSingleton}}{{&camelCaseName}}{{&cardinality}}
         {{/isSingleton}}{{/parameters}});
     }
     {{/isPATCH}}
