@@ -1,5 +1,6 @@
 .idea/
 node_modules/
+axiosTest/
 *.iml
 wks.*
 .DS_Store
