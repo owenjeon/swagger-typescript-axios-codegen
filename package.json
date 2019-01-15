@@ -1,5 +1,5 @@
 {
-  "name": "swagger-typescript-codegen",
+  "name": "swagger-typescript-axios-codegen",
   "main": "./lib/codegen.js",
   "version": "1.8.1",
   "description": "A Swagger Codegenerator tailored for typescript.",
